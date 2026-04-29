@@ -1,0 +1,154 @@
+{
+  "description": "Autotest configuration file for dependency tree detection validation",
+  "version": 1.7,
+  "base_config": {
+    "validate_scan_output": true,
+    "_comment_validate_scan_output": "Whether to validate the scan output/exit code. Options: true | false. Default: true",
+    "scan_output": {
+      "security_scan_report_conclusion": "success",
+      "_comment_security_scan_report_conclusion": "Optional. Expected scan report conclusion. Options: 'success' | 'failure'. This validates the security scan result status. If not provided, this check will not be performed.",
+      "total_libs_scanned": {
+        "eq": 6
+      },
+      "_comment_total_libs_scanned": "Optional. Expected number of libraries scanned with comparison operator. Validates that the scan processed libraries. If not provided, this check will not be performed.",
+      "expected_messages": [],
+      "_comment_expected_messages": "Optional. List of messages to validate in security check output/summary with severity levels. Each entry should have 'operator' (eq, regex, or contains), 'value' (string or regex pattern), and 'level' (info, error, or warning). If not provided, this check will not be performed.",
+      "_comment_expected_messages_info": "Level 'info': Standard message validation. Example: {'operator': 'contains', 'value': 'Security Check found', 'level': 'info'} or {'operator': 'regex', 'value': 'Total libraries.*scanned', 'level': 'info'}",
+      "_comment_expected_messages_error": "Level 'error': For negative test cases. Scanner logs are automatically attached to Report Portal. Example: {'operator': 'contains', 'value': 'Oops! An error occurred', 'level': 'error'}",
+      "_comment_expected_messages_warning": "Level 'warning': Validates warning messages with optional scan_details_report. .whitesource strictMode is automatically set to 'warning'. scan_details_report fields (filePath, description, details) support both regex patterns and substring matching. All scan_details_report fields are optional. Example without scan details: {'operator': 'regex', 'value': 'Scan Warnings: The scan completed with warnings.*', 'level': 'warning'}. Example with scan details: {'operator': 'regex', 'value': 'Scan Warnings: The scan completed with warnings.*', 'level': 'warning', 'scan_details_report': {'filePath': '.*/service-b/pyproject.toml', 'description': 'One or more of the installations failed', 'details': 'mend dependency.*does not support.*UV versions.*0.4.30'}}"
+    },
+    "validate_dependency_tree": true,
+    "_comment_validate_dependency_tree": "Whether to validate the dependency tree. Options: true | false. Default: true",
+    "dependency_tree": {
+      "check_dependency_tree_detection_status": true,
+      "_comment_check_dependency_tree_detection_status": "Whether to check if dependency tree was successfully detected. Options: true | false. Default: true",
+      "check_update_request_sca_results": false,
+      "_comment_check_update_request_sca_results": "Whether to validate extraProperties.scaResults from the update request. Parses scaResults as JSON and asserts: (1) totalFail is empty {}, (2) no results entry has level 'ERROR'. Options: true | false. Default: false",
+      "expected_total_dependencies_number": {
+        "eq": 6
+      },
+      "expected_direct_dependencies_number": {
+        "eq": 2
+      },
+      "expected_transitive_dependencies_number": {
+        "eq": 4
+      },
+      "_comment_expected_dependencies_number": "Optional. Expected number of dependencies with comparison operator. Operators: gt (>), gte (>=), lt (<), lte (<=), eq (==). If not provided, this check will not be performed. NOTE: colorama is win32-only (sys_platform == 'win32') and is excluded from Linux scanner counts.",
+      "direct_dependencies_names_list": {
+        "contains": [
+          "click",
+          "requests"
+        ]
+      },
+      "transitive_dependencies_names_list": {
+        "contains": [
+          "certifi",
+          "charset-normalizer",
+          "idna",
+          "urllib3"
+        ]
+      },
+      "_comment_dependencies_names_list": "Optional. Check specific libraries in direct dependencies. Operators: eq (==), contains (all items from expected list in actual), in(all items from actual list in expected), nin(actual list does not contain provided libs). If not provided, this check will not be performed. colorama is excluded - it is a win32-only conditional transitive dep of click.",
+      "expected_package_managers": {
+        "contains": [
+          "uv"
+        ]
+      },
+      "_comment_expected_package_managers": "Optional. Validate scanSummaryInfo.packageManagers list (values normalised to lowercase). Operators: eq (exact match), contains (actual has all expected), in (actual is subset of expected), nin (actual has none of expected). Example: {'contains': ['npm', 'maven']}. If not provided, this check will not be performed.",
+      "validate_agent_versions": false,
+      "expected_agent_version": "",
+      "expected_plugin_version": "",
+      "_comment_agent_versions": "Optional. Expected agent and plugin versions. If not provided, this check will not be performed.",
+      "validate_mend_tags": false,
+      "_comment_validate_mend_tags": "Whether to validate project tags from Mend Platform BFF API against update request extraProperties. Options: true | false. Default: false. When true, calls the BFF projects/summaries endpoint and cross-validates sourceUrl, repoId, CTX, commitId, repoFullName tags against extraProperties (owner, commitId, branchName, repository).",
+      "validate_checksums": false,
+      "_comment_validate_checksums": "Whether to validate SHA1 checksums of dependencies. Options: true | false. Default: false. When true, runs the checks configured in checksums_config.",
+      "checksums_config": {
+        "check_sha1_not_empty": false,
+        "_comment_check_sha1_not_empty": "Validate that all dependencies have non-empty sha1 and/or checksums.SHA1 fields. Catches missing SHA1 values. Options: true | false. Default: false",
+        "check_sha1_format": false,
+        "_comment_check_sha1_format": "Validate that all SHA1 values are valid 40-character lowercase hex strings. Catches malformed SHA1 values. Options: true | false. Default: false",
+        "check_sha1_consistency": false,
+        "_comment_check_sha1_consistency": "Validate that dep.sha1 matches dep.checksums.SHA1 when both are present. Catches internal inconsistencies. Options: true | false. Default: false",
+        "check_checksums_by_formula": false,
+        "_comment_check_checksums_by_formula": "Recompute SHA1/additionalSha1 using the known per-PM formula and compare against actual values. Options: true | false. Default: false",
+        "expected_dependency_checksums": [],
+        "_comment_expected_dependency_checksums": "Optional. List of specific dependencies with expected SHA1 values. Each entry: {'artifactId': 'pkg-name', 'version': '1.0.0', 'expected_sha1': '<40-char-hex>', 'expected_sha1_other_platform': '<40-char-hex>'}. If not provided, this check will not be performed."
+      }
+    },
+    "validate_vulnerabilities_table": false,
+    "_comment_validate_vulnerabilities_table": "Whether to validate the vulnerabilities table. Options: true | false. Default: true",
+    "vulnerabilities_table": {
+      "check_vulnerabilities_table_structure": true,
+      "expected_total_vulnerabilities_number": {
+        "gte": 0
+      },
+      "vulnerabilities_ids_list": {
+        "contains": []
+      },
+      "_comment_ids_names_list": "Optional. Check specific libs ids (WS-2018-0111, CVE-2021-44906). Operators: eq (==), contains (all items from expected list in actual), in(all items from actual list in expected), nin(actual list does not contain provided libs). If not provided, this check will not be performed.",
+      "vulnerabilities_names_list": {
+        "contains": []
+      },
+      "_comment_vulnerabilities_names_list": "Optional. Check specific libs names (minimist-0.0.8.tgz). Operators: eq (==), contains (all items from expected list in actual), in(all items from actual list in expected), nin(actual list does not contain provided libs). If not provided, this check will not be performed."
+    },
+    "validate_scanner_logs": false,
+    "_comment_validate_scanner_logs": "Whether to validate scanner logs. Options: true | false. Default: false",
+    "logs": {
+      "check_scanner_logs": true,
+      "_comment_check_scanner_logs": "Whether to check scanner logs and attach them to Report Portal. Options: true | false. Default: true",
+      "detect_secrets": false,
+      "_comment_detect_secrets": "Whether to scan scanner logs for leaked secrets (API tokens, passwords, private keys, etc.). Options: true | false. Default: false.",
+      "expected_log_lines": [],
+      "_comment_expected_log_lines": "Optional. List of log lines to validate. Each entry should have an 'operator' (eq or regex) and 'value' (string or regex pattern). Example: [{'operator': 'eq', 'value': 'Python version: 3.11'}, {'operator': 'regex', 'value': 'Python version: \\d+\\.\\d+'}]. If not provided, only log attachment will be performed."
+    },
+    "validate_reachability": false,
+    "_comment_validate_reachability": "Whether to validate reachability analysis. Options: true | false. Default: false. When enabled, .whitesource file will be automatically updated to set enableReachability: true if needed.",
+    "reachability": {
+      "check_reachability_status": true,
+      "_comment_check_reachability_status": "Whether to check if reachability analysis was successfully performed. Options: true | false. Default: true",
+      "validate_issues": false,
+      "_comment_validate_issues": "Whether to validate GitHub issues created for reachable vulnerabilities. Options: true | false. Default: false.",
+      "expected_reachable_cves": {
+        "contains": []
+      },
+      "_comment_expected_reachable_cves": "Optional. List of CVE IDs expected to be marked as reachable. If not provided, this check will not be performed.",
+      "expected_unreachable_cves": {
+        "contains": []
+      },
+      "_comment_expected_unreachable_cves": "Optional. List of CVE IDs expected to be marked as unreachable. If not provided, this check will not be performed.",
+      "expected_reachable_libraries": {
+        "contains": []
+      },
+      "_comment_expected_reachable_libraries": "Optional. List of libraries with their reachable vulnerabilities. If not provided, this check will not be performed.",
+      "expected_unreachable_libraries": {
+        "contains": []
+      },
+      "_comment_expected_unreachable_libraries": "Optional. List of libraries with their unreachable vulnerabilities. If not provided, this check will not be performed.",
+      "expected_total_reachable_count": {
+        "gte": 0
+      },
+      "_comment_expected_total_reachable_count": "Optional. Expected number of reachable CVEs with comparison operator. If not provided, this check will not be performed.",
+      "expected_total_unreachable_count": {
+        "gte": 0
+      },
+      "_comment_expected_total_unreachable_count": "Optional. Expected number of unreachable CVEs with comparison operator. If not provided, this check will not be performed.",
+      "expected_reachability_traces": [],
+      "_comment_expected_reachability_traces": "Optional. List of reachability traces to validate. If not provided, trace validation will not be performed."
+    },
+    "validate_project_contributors": false,
+    "_comment_validate_project_contributors": "Whether to validate project contributors information. Options: true | false. Default: true. When enabled, validates contributions object from dependency tree scan results.",
+    "contributors": {
+      "check_contributors_structure": true,
+      "_comment_check_contributors_structure": "Whether to validate basic contributors structure. Always performs basic checks: contributions not empty, repository link is valid (not empty), contributingDevelopers array not empty, each developer has email and commits >= 1. Options: true | false. Default: true",
+      "expected_contributors": [],
+      "_comment_expected_contributors": "Optional. Expected contributors email validation rules. Empty [] means no email validation.",
+      "expected_min_commits": {
+        "gte": 1
+      },
+      "_comment_expected_min_commits": "Optional. Expected minimum number of commits per contributor with comparison operator. Default: {'gte': 1}.",
+      "expected_total_contributors": {},
+      "_comment_expected_total_contributors": "Optional. Expected total number of contributors with comparison operator. If not provided, this check will not be performed."
+    }
+  }
+}
