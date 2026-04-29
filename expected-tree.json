@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "pattern": "python-version-pin",
+  "package_manager": "uv",
+  "python_version": "3.10.2",
+  "root": {
+    "name": "uv-python-version-pin-probe",
+    "version": "0.1.0",
+    "type": "root"
+  },
+  "direct_dependencies": [
+    {
+      "name": "requests",
+      "version": "2.31.0",
+      "type": "direct"
+    },
+    {
+      "name": "click",
+      "version": "8.1.7",
+      "type": "direct"
+    }
+  ],
+  "transitive_dependencies": [
+    {
+      "name": "certifi",
+      "version": "2026.4.22",
+      "type": "transitive",
+      "required_by": ["requests"]
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.4.7",
+      "type": "transitive",
+      "required_by": ["requests"]
+    },
+    {
+      "name": "idna",
+      "version": "3.13",
+      "type": "transitive",
+      "required_by": ["requests"]
+    },
+    {
+      "name": "urllib3",
+      "version": "2.6.3",
+      "type": "transitive",
+      "required_by": ["requests"]
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6",
+      "type": "transitive",
+      "required_by": ["click"],
+      "marker": "sys_platform == 'win32'"
+    }
+  ],
+  "total_dependencies": 7,
+  "direct_count": 2,
+  "transitive_count": 5,
+  "notes": [
+    "colorama is a conditional transitive dep of click, only activated on Windows (sys_platform == 'win32')",
+    "certifi version resolved to latest available (2026.4.22) despite requests==2.31.0 pinning requests itself",
+    "uv.lock was generated with uv 0.9.21 against Python 3.10.2"
+  ]
+}
